@@ -20,5 +20,26 @@ order by c.date
 ***
 **Задача 2.2** 
 
-***
-***
+Решение №1:  
+```sql
+select distinct on (r.id_patients) r.id_patients, r.id_doctors
+from receptions r 
+order by r.id_patients, r.startdatetime desc
+```
+Решение №2:  
+```sql
+with receptions_with_nums as (select r.id_patients, r.id_doctors, r.startdatetime,
+					row_number() OVER (
+			            PARTITION BY ID_Patients
+			            ORDER BY StartDateTime DESC
+			        ) as rn
+		    	from receptions r
+		    	)
+select id_patients, id_doctors
+from receptions_with_nums 
+where rn = 1
+```
+Решение №3:  
+```sql
+
+```
