@@ -19,7 +19,7 @@ class UserAlreadyExistsError(Exception):
 
 class UserCreateSchema(BaseModel):
     # Валидируем, что в поле телефон попадёт только то, что похоже на телефон
-    phone: str = Field(pattern=r"^\+?[0-9]{10,15}$")
+    phone: str = Field(pattern=r"^\+?\d{10,15}$")
     name: str = Field(min_length=2, max_length=100)
 
 
