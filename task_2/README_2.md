@@ -29,9 +29,9 @@ order by r.id_patients, r.startdatetime desc
 Решение №2:  
 ```sql
 with receptions_with_nums as (select r.id_patients, r.id_doctors, r.startdatetime,
-					row_number() OVER (
-			            PARTITION BY ID_Patients
-			            ORDER BY StartDateTime DESC
+					row_number() over (
+			            partition by id_patients
+			            order by startdatetime desc
 			        ) as rn
 		    	from receptions r
 		    	)
@@ -41,5 +41,14 @@ where rn = 1
 ```
 Решение №3:  
 ```sql
-
+select r1.id_patients, r1.id_doctors
+from receptions r1
+where r1.startdateTime = (
+    select max(r2.startdateTime)
+    from receptions r2
+    where r2.id_patients = r1.id_patients
+)
 ```
+Решение 1, 2 - всегда одна строка, когда в 3 варианте может вернутся несколько, если дат несколько
+Решение 2 лучше на больших объёмах данных
+Индекс везде ускоряет нахождение нужного результата
