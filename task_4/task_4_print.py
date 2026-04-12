@@ -4,7 +4,7 @@ MIN_DEFAULT_LENGTH = 9
 
 
 def calc_column_length(data: dict):
-    """Нахождение максимальной длины для каждого поля среди всех классов"""
+    """Нахождение минимальной длины для каждого из столбцов"""
     max_lengths = [
         max(len(row[i]) for rows in data.values() for row in rows) + 2 for i in range(3)
     ]
