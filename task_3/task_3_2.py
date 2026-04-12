@@ -4,9 +4,11 @@ from urllib.request import Request
 from fastapi.params import Depends
 from pydantic import BaseModel, Field
 from pydantic.config import ExtraValues
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.annotation import Annotated
 from starlette.responses import JSONResponse
 
-from task_3.task_3_1 import UserRepository
+from task_3.task_3_1 import UserRepository, get_session
 
 
 class UserNotFoundError(Exception):
@@ -45,6 +47,15 @@ class UserService:
 
         return self.user_repo.create_user(user)
 
+def get_user_repo(
+    session: AsyncSession = Annotated[AsyncSession, Depends(get_session)]
+) -> UserRepository:
+    return UserRepository(session, UserORM)
+
+def get_user_service(
+    repo: UserRepository = Annotated[UserRepository, Depends(get_user_repo)]
+) -> UserService:
+    return UserService(repo)
 
 @app.exception_handler(UserNotFoundError)
 async def database_error_handler(
@@ -87,6 +98,6 @@ async def database_error_handler(
 )  # Отдельный роутер для работы с пользователями
 async def register_patient(
     user: UserCreateSchema,
-    service: UserService = Depends(get_user_service),
+    service: UserService = Annotated[UserService, Depends(get_user_service)],
 ) -> UserCreateSchema:
     return await service.register_user(user=user)

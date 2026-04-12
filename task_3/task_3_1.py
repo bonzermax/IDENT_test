@@ -1,10 +1,17 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar, Type
 
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
 from task_3.task_3_2 import UserCreateSchema
 
 T = TypeVar("T")
 
+engine = create_async_engine()
+
+async def get_session():
+    async with async_sessionmaker(engine) as session:
+        yield session
 
 class DatabaseError(Exception):
     pass
