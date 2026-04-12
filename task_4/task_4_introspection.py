@@ -7,10 +7,6 @@ from pydantic_core import PydanticUndefinedType
 from task_4.task_4_print import print_models_info
 
 
-class NotBaseModelSubclass(Exception):
-    pass
-
-
 class Task(BaseModel):
     id: int = 1
     name: str = None
@@ -38,11 +34,17 @@ class Task3(BaseModel):
     stmt2: Union[str, dict]
 
 
-def check_all_are_basemodel(_models: set) -> bool:
+def check_models_input(_models: list) -> bool:
     """Проверка, что все модели наследуются от BaseModel"""
+    if not isinstance(_models, list):
+        raise Exception("Передаваемый объект должен быть списком")
+
+    if not _models:
+        raise Exception("Был передан пустой список")
+
     for m in _models:
         if not issubclass(m, BaseModel):
-            raise NotBaseModelSubclass(f"{m.__name__} не наследуется от BaseModel")
+            raise Exception(f"{m.__name__} не наследуется от BaseModel")
     return True
 
 
@@ -74,9 +76,12 @@ def get_cls_info(_model: type[BaseModel]) -> list:
     return class_info
 
 
-def process_user_models(_models: set):
+def process_user_models(data: list):
     """Обработка классов"""
-    check_all_are_basemodel(_models)
+    check_models_input(data)
+
+    # Преобразовываем в set, чтобы не выводились дубли
+    _models = set(data)
 
     models_info = dict()
     for model in _models:
@@ -87,11 +92,10 @@ def process_user_models(_models: set):
 
 
 if __name__ == "__main__":
-    user_models = {
-        Task,
+    user_models = [
+        Task2,
         Task2,
         Task3,
-    }  # set, чтобы дубли не выводились, даже если они попадут
+    ]
 
-    if user_models:
-        process_user_models(user_models)
+    process_user_models(user_models)
